@@ -1,0 +1,9 @@
+{
+  "name": "MMM-ProfileAndWeatherAlerts",
+  "version": "1.0.0",
+  "description": "A Magic Mirror module to display profile picture, name, and weather alerts via Metalerts 2.0",
+  "main": "MMM-ProfileAndWeatherAlerts.js",
+  "dependencies": {
+    "request": "^2.88.2"
+  }
+}
