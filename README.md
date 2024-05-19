@@ -39,7 +39,7 @@ Add some [config entries](#configuration) in your config.js file.
     config: {
         profileImage: "path/to/profile.jpg",
         name: "John Doe",
-        metalertsUrl: "URL_TO_METALERTS_ENDPOINT",
+        metalertsUrl: "URL_TO_METALERTS_ENDPOINT", // example: https://api.met.no/weatherapi/metalerts/2.0/current?lat=60.67659&lon=10.81997  Change lat and lon. 
         showProfileImage: true,
         showName: true,
         hideWhenNoAlerts: true // Set to true to hide the module when there are no alerts
