@@ -2,7 +2,10 @@ Module.register("MMM-ProfileAndWeatherAlerts", {
     defaults: {
         profileImage: "path/to/profile.jpg",
         name: "John Doe",
-        metalertsUrl: "URL_TO_METALERTS_ENDPOINT"
+        metalertsUrl: "URL_TO_METALERTS_ENDPOINT",
+        showProfileImage: true,
+        showName: true,
+        hideWhenNoAlerts: false
     },
 
     start: function() {
@@ -21,20 +24,26 @@ Module.register("MMM-ProfileAndWeatherAlerts", {
         var wrapper = document.createElement("div");
 
         // Profile section
-        var profileWrapper = document.createElement("div");
-        profileWrapper.className = "profile-wrapper";
+        if (this.config.showProfileImage || this.config.showName) {
+            var profileWrapper = document.createElement("div");
+            profileWrapper.className = "profile-wrapper";
 
-        var img = document.createElement("img");
-        img.src = this.config.profileImage;
-        img.className = "profile-image";
-        profileWrapper.appendChild(img);
+            if (this.config.showProfileImage) {
+                var img = document.createElement("img");
+                img.src = this.config.profileImage;
+                img.className = "profile-image";
+                profileWrapper.appendChild(img);
+            }
 
-        var name = document.createElement("div");
-        name.innerHTML = this.config.name;
-        name.className = "profile-name";
-        profileWrapper.appendChild(name);
+            if (this.config.showName) {
+                var name = document.createElement("div");
+                name.innerHTML = this.config.name;
+                name.className = "profile-name";
+                profileWrapper.appendChild(name);
+            }
 
-        wrapper.appendChild(profileWrapper);
+            wrapper.appendChild(profileWrapper);
+        }
 
         // Alerts section
         var alertsWrapper = document.createElement("div");
@@ -47,7 +56,11 @@ Module.register("MMM-ProfileAndWeatherAlerts", {
                 alertDiv.innerHTML = `
                     <div class="alert-title">${alert.title}</div>
                     <div class="alert-description">${alert.description}</div>
+                    <div class="alert-severity">Severity: ${alert.severity}</div>
+                    <div class="alert-area">Area: ${alert.area}</div>
                     <div class="alert-instructions">${alert.instructions}</div>
+                    <div class="alert-interval">From: ${alert.interval[0]} To: ${alert.interval[1]}</div>
+                    <div class="alert-contact"><a href="${alert.contact}" target="_blank">More info</a></div>
                 `;
                 alertsWrapper.appendChild(alertDiv);
             });
@@ -77,6 +90,13 @@ Module.register("MMM-ProfileAndWeatherAlerts", {
                     contact: alert.contact
                 };
             });
+
+            if (this.alerts.length > 0) {
+                this.show(); // Show module if there are alerts
+            } else if (this.config.hideWhenNoAlerts) {
+                this.hide(); // Hide module if there are no alerts and hideWhenNoAlerts is true
+            }
+
             this.updateDom();
         }
     }
