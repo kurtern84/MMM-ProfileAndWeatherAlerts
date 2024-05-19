@@ -1,6 +1,6 @@
 # MMM-ProfileAndWeather
-A module for magicmirror that shows profile picture, name and shows weather warnings from metalerts 2.0 (Yr.no)
-Set the path to the profilpicture, your latitude/longitude, and your name in your config. Look at configuration options bellow
+A module for magicmirror that shows profile picture (optional), name (optional) and shows weather warnings from metalerts 2.0 (Yr.no) mainly from Norway.
+Set the path to the profilpicture, add your latitude/longitude, and your name in your config. Look at configuration options bellow
 
 ### Screenshot
 
