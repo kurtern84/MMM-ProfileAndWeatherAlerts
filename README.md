@@ -35,11 +35,14 @@ Add some [config entries](#configuration) in your config.js file.
 ```javascript
 {
     module: "MMM-ProfileAndWeatherAlerts",
-    position: "top_bar", // or where you want it placed
+    position: "top_right",
     config: {
-        profileImage: "path/to/your/profile.jpg",
+        profileImage: "path/to/profile.jpg",
         name: "John Doe",
-        metalertsUrl: "https://api.met.no/weatherapi/metalerts/2.0/current.json?lat=60.67659&lon=10.81997" // change latitude and longitude
+        metalertsUrl: "URL_TO_METALERTS_ENDPOINT",
+        showProfileImage: true,
+        showName: true,
+        hideWhenNoAlerts: true // Set to true to hide the module when there are no alerts
     }
 },
 
