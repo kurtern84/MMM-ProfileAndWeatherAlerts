@@ -5,7 +5,7 @@ Set the path to the profilpicture, your latitude/longitude, and your name in you
 ### Screenshot
 
 
-<img style="flat: left; width: 50%;" src="Screenshot/screenshot.png">
+<img style="flat: left; width: 50%;" src="screenshot.png">
 
 ### Installation
 
