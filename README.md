@@ -2,6 +2,10 @@
 A module for magicmirror that shows profile picture, name and shows weather warnings from metalerts 2.0 (Yr.no)
 Set the path to the profilpicture, your latitude/longitude, and your name in your config. Look at configuration options bellow
 
+### Screenshot
+
+
+<img style="flat: left; width: 50%;" src="Screenshot/screenshot.png">
 
 ### Installation
 
