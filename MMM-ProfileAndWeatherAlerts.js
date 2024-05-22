@@ -3,17 +3,17 @@ Module.register("MMM-ProfileAndWeatherAlerts", {
         profileImage: "path/to/profile.jpg",
         name: "John Doe",
         metalertsUrl: "URL_TO_METALERTS_ENDPOINT",
-        showProfileImage: true,
-        showName: true,
-        hideWhenNoAlerts: false
+        updateInterval: 10 * 60 * 1000, // Oppdater hvert 10. minutt
+        scrollSpeed: 3000 // Hastigheten på rulling i millisekunder
     },
 
     start: function() {
+        this.alertIndex = 0;
         this.alerts = [];
         this.getWeatherAlerts();
         setInterval(() => {
             this.getWeatherAlerts();
-        }, 10 * 60 * 1000); // Update every 10 minutes
+        }, this.config.updateInterval);
     },
 
     getStyles: function() {
@@ -23,50 +23,28 @@ Module.register("MMM-ProfileAndWeatherAlerts", {
     getDom: function() {
         var wrapper = document.createElement("div");
 
-        // Profile section
-        if (this.config.showProfileImage || this.config.showName) {
-            var profileWrapper = document.createElement("div");
-            profileWrapper.className = "profile-wrapper";
+        var profileWrapper = document.createElement("div");
+        profileWrapper.className = "profile-wrapper";
 
-            if (this.config.showProfileImage) {
-                var img = document.createElement("img");
-                img.src = this.config.profileImage;
-                img.className = "profile-image";
-                profileWrapper.appendChild(img);
-            }
+        var img = document.createElement("img");
+        img.src = this.config.profileImage;
+        img.className = "profile-image";
+        profileWrapper.appendChild(img);
 
-            if (this.config.showName) {
-                var name = document.createElement("div");
-                name.innerHTML = this.config.name;
-                name.className = "profile-name";
-                profileWrapper.appendChild(name);
-            }
+        var name = document.createElement("div");
+        name.innerHTML = this.config.name;
+        name.className = "profile-name";
+        profileWrapper.appendChild(name);
 
-            wrapper.appendChild(profileWrapper);
-        }
+        wrapper.appendChild(profileWrapper);
 
-        // Alerts section
         var alertsWrapper = document.createElement("div");
         alertsWrapper.className = "alerts-wrapper";
 
-        if (this.alerts.length > 0) {
-            this.alerts.forEach(alert => {
-                var alertDiv = document.createElement("div");
-                alertDiv.className = "alert";
-                alertDiv.innerHTML = `
-                    <div class="alert-title">${alert.title}</div>
-                    <div class="alert-description">${alert.description}</div>
-                    <div class="alert-severity">Severity: ${alert.severity}</div>
-                    <div class="alert-area">Area: ${alert.area}</div>
-                    <div class="alert-instructions">${alert.instructions}</div>
-                    <div class="alert-interval">From: ${alert.interval[0]} To: ${alert.interval[1]}</div>
-                    <div class="alert-contact"><a href="${alert.contact}" target="_blank">More info</a></div>
-                `;
-                alertsWrapper.appendChild(alertDiv);
-            });
-        } else {
-            alertsWrapper.innerHTML = "Du har ingen varsler";
-        }
+        var alertDiv = document.createElement("div");
+        alertDiv.className = "alert";
+        alertDiv.innerHTML = this.alerts[this.alertIndex];
+        alertsWrapper.appendChild(alertDiv);
 
         wrapper.appendChild(alertsWrapper);
 
@@ -79,25 +57,18 @@ Module.register("MMM-ProfileAndWeatherAlerts", {
 
     socketNotificationReceived: function(notification, payload) {
         if (notification === "METALERTS_DATA") {
-            this.alerts = payload.map(alert => {
-                return {
-                    title: alert.title,
-                    description: alert.description,
-                    severity: alert.severity,
-                    area: alert.area,
-                    instructions: alert.instructions,
-                    interval: alert.interval,
-                    contact: alert.contact
-                };
-            });
-
-            if (this.alerts.length > 0) {
-                this.show(); // Show module if there are alerts
-            } else if (this.config.hideWhenNoAlerts) {
-                this.hide(); // Hide module if there are no alerts and hideWhenNoAlerts is true
-            }
-
+            this.alerts = payload;
+            this.alertIndex = 0; // Start med det første varselet
             this.updateDom();
+            this.rotateAlerts();
         }
+    },
+
+    rotateAlerts: function() {
+        var self = this;
+        setInterval(function() {
+            self.alertIndex = (self.alertIndex + 1) % self.alerts.length;
+            self.updateDom(self.config.scrollSpeed);
+        }, self.config.scrollSpeed);
     }
 });
