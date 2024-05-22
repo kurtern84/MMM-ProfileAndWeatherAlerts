@@ -11,32 +11,19 @@
 
 .profile-name {
     font-size: 1.5em;
-    font-weight: bold;
-    margin-top: 10px;
+    margin-top: 5px;
 }
 
 .alerts-wrapper {
-    padding: 10px;
+    text-align: center;
+    font-size: 1.2em;
 }
 
 .alert {
-    margin-bottom: 15px;
-    padding: 10px;
-    background: #000;
+    animation: fadeIn 1s;
 }
 
-.alert-title {
-    font-weight: bold;
-    font-size: 0.8em;
-    margin-bottom: 5px;
-}
-
-.alert-description {
-    margin-bottom: 5px;
-    font-size: 0.6em;
-}
-
-.alert-severity, .alert-area, .alert-instructions, .alert-interval, .alert-contact {
-    margin-bottom: 5px;
-    font-size: 0.6em;
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
