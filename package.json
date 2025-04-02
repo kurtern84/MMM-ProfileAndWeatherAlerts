@@ -4,6 +4,8 @@
   "description": "A Magic Mirror module to display profile picture, name, and weather alerts via Metalerts 2.0",
   "main": "MMM-ProfileAndWeatherAlerts.js",
   "dependencies": {
+    "dayjs": "^1.11.10",
+    "node-fetch": "^3.3.2",
     "request": "^2.88.2"
   }
 }
