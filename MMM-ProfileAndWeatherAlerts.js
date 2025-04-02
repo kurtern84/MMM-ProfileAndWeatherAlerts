@@ -84,6 +84,7 @@ Module.register("MMM-ProfileAndWeatherAlerts", {
         if (data && data.features && data.features.length > 0) {
             return data.features.map(feature => {
                 let title = feature.properties.title || "Ukjent varsel";
+                let description = feature.properties.description || "";
                 let onset = null;
                 let ends = null;
 
@@ -101,7 +102,9 @@ Module.register("MMM-ProfileAndWeatherAlerts", {
                     timeBlock = "<div class='pwa-alert-time'>Fra: " + (onset || "ukjent") + " - Til: " + (ends || "ukjent") + "</div>";
                 }
 
-                return "<div class='pwa-alert-title'>" + title + "</div>" + timeBlock;
+                let descriptionBlock = description ? "<div class='pwa-alert-description'>" + description + "</div>" : "";
+
+                return "<div class='pwa-alert-title'>" + title + "</div>" + descriptionBlock + timeBlock;
             });
         }
         return [];
