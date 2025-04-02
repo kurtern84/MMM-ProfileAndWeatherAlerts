@@ -6,7 +6,7 @@ Module.register("MMM-ProfileAndWeatherAlerts", {
         showProfileImage: true,
         showName: true,
         hideWhenNoAlerts: false,
-        alertDisplayInterval: 5000 // Time to display each alert (in milliseconds)
+        alertDisplayInterval: 5000
     },
 
     start: function() {
@@ -14,13 +14,18 @@ Module.register("MMM-ProfileAndWeatherAlerts", {
         this.currentAlertIndex = 0;
         this.alertInterval = null;
         this.getWeatherAlerts();
+        this.updateDom(1000);
         setInterval(() => {
             this.getWeatherAlerts();
-        }, 10 * 60 * 1000); // Update every 10 minutes
+        }, 10 * 60 * 1000);
     },
 
     getStyles: function() {
         return ["MMM-ProfileAndWeatherAlerts.css"];
+    },
+
+    getScripts: function () {
+        return ["https://unpkg.com/dayjs@1.11.10/dayjs.min.js", "https://unpkg.com/dayjs/locale/nb.js"];
     },
 
     getDom: function() {
@@ -33,33 +38,12 @@ Module.register("MMM-ProfileAndWeatherAlerts", {
 
         wrapper.style.display = "block";
 
-        if (this.config.showProfileImage || this.config.showName) {
-            var profileWrapper = document.createElement("div");
-            profileWrapper.className = "profile-wrapper";
-
-            if (this.config.showProfileImage) {
-                var img = document.createElement("img");
-                img.src = this.config.profileImage;
-                img.className = "profile-image";
-                profileWrapper.appendChild(img);
-            }
-
-            if (this.config.showName) {
-                var name = document.createElement("div");
-                name.innerHTML = this.config.name;
-                name.className = "profile-name";
-                profileWrapper.appendChild(name);
-            }
-
-            wrapper.appendChild(profileWrapper);
-        }
-
         var alertsWrapper = document.createElement("div");
-        alertsWrapper.className = "alerts-wrapper";
+        alertsWrapper.className = "pwa-alerts-wrapper";
 
         if (this.alerts.length > 0) {
             var alertDiv = document.createElement("div");
-            alertDiv.className = "alert";
+            alertDiv.className = "pwa-alert";
             alertDiv.innerHTML = this.alerts[this.currentAlertIndex];
             alertsWrapper.appendChild(alertDiv);
 
@@ -73,11 +57,10 @@ Module.register("MMM-ProfileAndWeatherAlerts", {
                 }, this.config.alertDisplayInterval);
             }
         } else {
-            alertsWrapper.innerHTML = "Du har ingen varsler";
+            alertsWrapper.innerHTML = "<div class='pwa-no-alerts'>Du har ingen varsler</div>";
         }
 
         wrapper.appendChild(alertsWrapper);
-
         return wrapper;
     },
 
@@ -87,16 +70,39 @@ Module.register("MMM-ProfileAndWeatherAlerts", {
 
     socketNotificationReceived: function(notification, payload) {
         if (notification === "METALERTS_DATA") {
-            console.log("METALERTS_DATA received:", payload);
             this.alerts = this.processAlerts(payload);
             this.currentAlertIndex = 0;
-            this.updateDom();
+            this.updateDom(1000);
         }
     },
 
     processAlerts: function(data) {
+        if (typeof dayjs !== "undefined") {
+            dayjs.locale("nb");
+        }
+
         if (data && data.features && data.features.length > 0) {
-            return data.features.map(feature => feature.properties.title);
+            return data.features.map(feature => {
+                let title = feature.properties.title || "Ukjent varsel";
+                let onset = null;
+                let ends = null;
+
+                const dateRegex = /(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2})/g;
+                const dates = title.match(dateRegex);
+
+                if (dates && typeof dayjs !== "undefined") {
+                    if (dates[0]) onset = dayjs(dates[0]).format("dddd D. MMMM kl. HH:mm");
+                    if (dates[1]) ends = dayjs(dates[1]).format("dddd D. MMMM kl. HH:mm");
+                    title = title.replace(dateRegex, "").trim();
+                }
+
+                let timeBlock = "";
+                if (onset || ends) {
+                    timeBlock = "<div class='pwa-alert-time'>Fra: " + (onset || "ukjent") + " - Til: " + (ends || "ukjent") + "</div>";
+                }
+
+                return "<div class='pwa-alert-title'>" + title + "</div>" + timeBlock;
+            });
         }
         return [];
     }
